@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    depends_on:
+      - server
+    ports:
+      - 8080:80
+
+  server:
+    build: ./server
+    container_name: server
+    depends_on:
+      - mongo
+
+  mongo:
+    build: ./mongo
+    container_name: mongo
+    restart: always
+    # environment:
+    #   MONGO_INITDB_DATABASE: admin
+      # MONGO_INITDB_ROOT_USERNAME: admin
+      # MONGO_INITDB_ROOT_PASSWORD: secret
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo/initdb.d:/docker-entrypoint-initdb.d
+      - ./mongo/mongo-data:/data/db
+    # Start mongo with authentication enabled
+    command: [mongod, --auth]
